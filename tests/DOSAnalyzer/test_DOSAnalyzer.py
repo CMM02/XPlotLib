@@ -1,6 +1,7 @@
 from XPlotLib.DOSAnalyzer import DOSAnalyzer
 import pandas as pd
 import pytest
+from matplotlib.testing.decorators import image_comparison
 
 
 def load_dos(dosAnalyzer):
@@ -36,15 +37,23 @@ def test_load_dos(capfd):
     out, err = capfd.readouterr()    
     assert out == expected
 
-def plot_dos(dosAnalyzer):
+def configure_dos_plot(dosAnalyzer):
     load_dos(dosAnalyzer)
     dosAnalyzer.set_active_dos(xes_names=['O1_GS_p', 'O2_GS_p', 'O3_GS_p', 'O4_GS_p', 'O5_GS_p'], xas_names=['O1_ES_p', 'O2_ES_p', 'O3_ES_p', 'O4_ES_p', 'O5_ES_p'])
     dosAnalyzer.set_custom_dos_scale(1.5, 1.5)
     dosAnalyzer.set_title('Ti3O5 DOS Analysis') 
-    dosAnalyzer.plot_dos(staggered=True)
 
-# @patch('methylcheck.qc_plot.plt.show')
-# def test_plot_dos():
-#     dosAnalyzer = DOSAnalyzer()
-#     plot_dos(dosAnalyzer)
-#     assert True
+
+@image_comparison(baseline_images=['normal_dos'], remove_text=True,
+                  extensions=['png'], style='mpl20')
+def test_plot_dos():
+    dosAnalyzer = DOSAnalyzer()
+    configure_dos_plot(dosAnalyzer)
+    dosAnalyzer.plot_dos()
+
+@image_comparison(baseline_images=['staggerd_dos'], remove_text=True,
+                  extensions=['png'], style='mpl20')
+def test_plot_dos_staggered():
+    dosAnalyzer = DOSAnalyzer()
+    configure_dos_plot(dosAnalyzer)
+    dosAnalyzer.plot_dos(staggered=True)
