@@ -51,7 +51,6 @@ coverage.xml
 .pytest_cache/
 cover/
 result_images/
-tests/DOSAnalyzer/actual/
 
 # Translations
 *.mo
