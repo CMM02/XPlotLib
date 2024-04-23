@@ -448,7 +448,7 @@ class DOSAnalyzer:
     export_spectra : list of str
         List of spectra to export ("XES" or "XAS")
     """
-    def export_selected_dos(self, path, name, export_spectra=['XES', 'XAS']):
+    def export_dos(self, path, name, export_spectra=['XES', 'XAS']):
         if len(export_spectra) == 0:
             print('No spectra selected for export, select from "XES" and "XAS"')
             return

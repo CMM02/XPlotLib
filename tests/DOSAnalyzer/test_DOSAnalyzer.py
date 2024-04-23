@@ -1,11 +1,14 @@
 from XPlotLib.DOSAnalyzer import DOSAnalyzer
 import pandas as pd
 import pytest
+import filecmp
 from matplotlib.testing.decorators import image_comparison
+
+base_dir = 'tests/DOSAnalyzer/'
 
 
 def load_dos(dosAnalyzer):
-    dir = 'tests/DOSAnalyzer/data/'
+    dir = base_dir + 'data/'
     sites = {'4': 'O1', '5': 'O2', '6': 'O3', '7': 'O4','8': 'O5'}
     binding_energies = {}
     calc_energies = pd.read_csv(f'{dir}Ti3O5_calculation_energies.csv', index_col=0)
@@ -37,7 +40,7 @@ def test_load_dos(capfd):
     out, err = capfd.readouterr()    
     assert out == expected
 
-def configure_dos_plot(dosAnalyzer):
+def configure_dos(dosAnalyzer):
     load_dos(dosAnalyzer)
     dosAnalyzer.set_active_dos(xes_names=['O1_GS_p', 'O2_GS_p', 'O3_GS_p', 'O4_GS_p', 'O5_GS_p'], xas_names=['O1_ES_p', 'O2_ES_p', 'O3_ES_p', 'O4_ES_p', 'O5_ES_p'])
     dosAnalyzer.set_custom_dos_scale(1.5, 1.5)
@@ -48,12 +51,19 @@ def configure_dos_plot(dosAnalyzer):
                   extensions=['png'], style='mpl20')
 def test_plot_dos():
     dosAnalyzer = DOSAnalyzer()
-    configure_dos_plot(dosAnalyzer)
+    configure_dos(dosAnalyzer)
     dosAnalyzer.plot_dos()
 
 @image_comparison(baseline_images=['staggerd_dos'], remove_text=True,
                   extensions=['png'], style='mpl20')
 def test_plot_dos_staggered():
     dosAnalyzer = DOSAnalyzer()
-    configure_dos_plot(dosAnalyzer)
+    configure_dos(dosAnalyzer)
     dosAnalyzer.plot_dos(staggered=True)
+
+def test_export_dos():
+    dosAnalyzer = DOSAnalyzer()
+    configure_dos(dosAnalyzer)
+    dosAnalyzer.export_dos(f'{base_dir}actual/', 'Ti3O5_DOS_Analysis')
+    assert filecmp.cmp(f'{base_dir}expected/Ti3O5_DOS_Analysis_XAS.csv', f'{base_dir}actual/Ti3O5_DOS_Analysis_XAS.csv')
+    assert filecmp.cmp(f'{base_dir}expected/Ti3O5_DOS_Analysis_XES.csv', f'{base_dir}actual/Ti3O5_DOS_Analysis_XES.csv')
