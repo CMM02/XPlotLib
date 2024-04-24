@@ -235,6 +235,9 @@ class BandgapAnalyzer():
         # remove space between subplots
         fig.subplots_adjust(wspace=0, hspace=0)
 
+        if self.title:
+            fig.suptitle(self.title, y = 0.95)
+
         for i in range(len(axes)):
             for j in range(len(axes[i])):
                 ax = axes[i,j]
