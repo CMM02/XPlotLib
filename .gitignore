@@ -161,3 +161,5 @@ cython_debug/
 #.idea/
 
 junit/
+tests/BandgapAnalyzer/data/.DS_Store
+tio-o-k-measurements.ipynb
