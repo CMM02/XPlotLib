@@ -122,6 +122,9 @@ class BandgapAnalyzer():
             if onset_region:
                 fig, (ax, ax_onset) = plt.subplots(1,2, figsize=(10,6))
                 ax_onset.set_xlim(onset_region)
+                ax_onset.set_xlim(onset_region)
+                y_onset = exp_spectra[name].loc[(exp_spectra[name][f'{name}_energy'] >= onset_region[0]) & (exp_spectra[name][f'{name}_energy'] <= onset_region[1]), f'{name}_intensity']
+                ax_onset.set_ylim(min(y_onset), max(y_onset))
                 ax_onset.plot(x, y, label='Raw data')
                 ax_onset.plot(x, y_smoothed, label='Smoothed data')
                 ax_onset.legend()
