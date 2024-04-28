@@ -8,8 +8,8 @@ import numpy as np
 # from bokeh.models import CheckboxGroup, CustomJS
 # from bokeh.layouts import column, row
 import matplotlib.pyplot as plt
+from .XPlotLibUtils import ryd_to_ev
 
-Ryd = 13.605698066 # Rydberg energy to eV
 
 
 class DOSAnalyzer:
@@ -175,12 +175,12 @@ class DOSAnalyzer:
         dos = self.__join_dos_dfs__(dos_parts)
 
         # convert rydberg to eV
-        dos['ENERGY'] = dos['ENERGY'] * Ryd
+        dos['ENERGY'] = dos['ENERGY'] * ryd_to_ev
 
         # shift energy to correct scale for each of the sites
         for site_name, binding_energy in binding_energies.items():
             site_dos = dos.filter(regex=f'{site_name}.*', axis=1)
-            site_dos.insert(loc=0, column='ENERGY', value=dos['ENERGY'] + binding_energy * Ryd)
+            site_dos.insert(loc=0, column='ENERGY', value=dos['ENERGY'] + binding_energy * ryd_to_ev)
             self.dos_dfs.append(site_dos)
 
     """
@@ -222,10 +222,10 @@ class DOSAnalyzer:
         dos = self.__join_dos_dfs__(dos_parts)
 
         # convert rydberg to eV
-        dos['ENERGY'] = dos['ENERGY'] * Ryd
+        dos['ENERGY'] = dos['ENERGY'] * ryd_to_ev
 
         # shift energy to correct scale
-        dos['ENERGY'] = dos['ENERGY'] + binding_Energy * Ryd
+        dos['ENERGY'] = dos['ENERGY'] + binding_Energy * ryd_to_ev
         
 
         self.dos_dfs.append(dos)

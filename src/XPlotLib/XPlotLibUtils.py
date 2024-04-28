@@ -1,5 +1,7 @@
 import numpy as np
 
+ryd_to_ev = 13.605698066
+
 def non_uniform_savgol(x, y, window, polynom):
     """
     Applies a Savitzky-Golay filter to y with non-uniform spacing
