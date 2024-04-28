@@ -278,9 +278,11 @@ class BandgapAnalyzer():
 
     
     def __find_onset(self, path, binding, fermi):
-        df = pd.read_csv(path, sep='\s+', header=None, names=['energy', 'intensity1', 'intensity2', 'intensity3'])
+        df = pd.read_csv(path, sep='\\s+', header=None, names=['energy', 'intensity1', 'intensity2', 'intensity3'])
         onset = min(df.loc[df['intensity1']>0]['energy']) + (binding + fermi) * ryd_to_ev
         return onset
+    
+
     """
     Load unbrodened spectra to determine core hole shift
 

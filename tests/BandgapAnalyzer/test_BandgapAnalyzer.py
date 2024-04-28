@@ -18,5 +18,5 @@ def test_plot_bandgap():
     bandgapAnalyzer.smoothen('xas', 'PFY', 15, 3, [528, 530], show=False)
     bandgapAnalyzer.set_xlims([515, 535], [520, 540])
     bandgapAnalyzer.add_arrow('xes', (528.8, 0.15), (531.8, 0.35), '528.8 eV')
-    bandgapAnalyzer.add_arrow('xas', (529, 1.7), (526, 1.7), '529.1 eV')
+    bandgapAnalyzer.add_arrow('xas', (529, 0.7), (526, 0.7), '529.1 eV')
     bandgapAnalyzer.plot(['XES'], ['XES calc'], ['PFY'], ['XANES calc'])
