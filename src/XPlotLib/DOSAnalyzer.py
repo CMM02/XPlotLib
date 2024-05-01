@@ -23,6 +23,8 @@ class DOSAnalyzer:
         self.xas_shift = 0
         self.xes_DOS_scale = 1
         self.xas_DOS_scale = 1
+        self.xes_x_lims = None
+        self.xas_x_lims = None
         self.staggered_spacing = 0.2
         self.title = 'DOS Analyzer'
 
@@ -113,9 +115,10 @@ class DOSAnalyzer:
                 selected_dos_dfs.append(dos_df)      
         return selected_dos_dfs
     
-    def __configure_plot__(self, ax, spectra, x_min, label, fig_count):
+    def __configure_plot__(self, ax, spectra, x_min, label, fig_count, x_lims=None):
             ax.text(0.075*fig_count/self.figsize[0], 0.2/self.figsize[1], label, ha='left', va='top', color='white', size=12, bbox=dict(facecolor='black', edgecolor='none', pad=3.0), transform=ax.transAxes)   
-            x_lims = self.__get_x_lims__(spectra.values())
+            if x_lims is None:
+                x_lims = self.__get_x_lims__(spectra.values())
             ax.set_xlim(x_lims)
             ax.set_ylim(x_min, 1.1)
             ax.set_yticklabels([])
@@ -365,6 +368,21 @@ class DOSAnalyzer:
 
 
     """
+    Set x limits for XES and XAS DOS
+
+    Parameters
+    ----------
+    xes_x_limits : tuple of float
+        X limits for XES DOS
+    xas_x_limits : tuple of float
+        X limits for XAS DOS
+    """
+    def set_x_limits(self, xes_x_limits=None, xas_x_limits=None):
+        self.xes_x_lims = xes_x_limits
+        self.xas_x_lims = xas_x_limits
+
+
+    """
     Plot DOS with XES and XAS spectra
 
     Parameters
@@ -403,10 +421,10 @@ class DOSAnalyzer:
         x_min =  -0.1 - (max(len(active_xes_dos_cols), len(active_xes_dos_cols))-1) * self.staggered_spacing if staggered else -0.1
 
         if 'XES' in show_spectra:
-            xes_x_lims = self.__configure_plot__(self.ax_xes, self.xes_spectra, x_min, 'nXES', len(show_spectra))
+            self.xes_x_lims = self.__configure_plot__(self.ax_xes, self.xes_spectra, x_min, 'nXES', len(show_spectra), x_lims=self.xes_x_lims)
         
         if 'XAS' in show_spectra:
-            xas_x_lims = self.__configure_plot__(self.ax_xas, self.xas_spectra, x_min, 'XAS', len(show_spectra))
+            self.xas_x_lims = self.__configure_plot__(self.ax_xas, self.xas_spectra, x_min, 'XAS', len(show_spectra), x_lims=self.xas_x_lims)
     
         # plot spectra
         if 'XES' in show_spectra:
@@ -420,12 +438,12 @@ class DOSAnalyzer:
             if len(selected_xes_dos_dfs) == 0:
                 print('No XES DOS selected for plotting')
             else:
-                self.__plot_dos__(self.ax_xes, selected_xes_dos_dfs, xes_x_lims, self.xes_shift, self.xes_DOS_scale, staggered)
+                self.__plot_dos__(self.ax_xes, selected_xes_dos_dfs, self.xes_x_lims, self.xes_shift, self.xes_DOS_scale, staggered)
         if 'XAS' in show_spectra:
             if len(selected_xas_dos_dfs) == 0:
                 print('No XAS DOS selected for plotting')
             else:
-                self.__plot_dos__(self.ax_xas,selected_xas_dos_dfs, xas_x_lims, self.xas_shift, self.xas_DOS_scale, staggered)
+                self.__plot_dos__(self.ax_xas,selected_xas_dos_dfs, self.xas_x_lims, self.xas_shift, self.xas_DOS_scale, staggered)
 
 
 
