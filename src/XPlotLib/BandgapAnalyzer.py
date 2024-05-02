@@ -316,4 +316,35 @@ class BandgapAnalyzer():
     def calc_core_hole_shift(self):
         return min(self.es_onsets) - min(self.gs_onsets)
 
+
+    """
+    Export 2nd derivative of XES and XAS spectra to csv files
+
+    Parameters
+    ----------
+    path : str
+        Path to the directory where the files will be saved
+    name : str
+        Name of the files (without extension)
+    """
+
+    def export_2nd_derivative(self, path, name):
+        xes_2nd = pd.DataFrame()
+        for xes_exp_name in self.xes_exp_spectra.keys():
+            if f'{xes_exp_name}_smoothed_2nd' not in self.xes_exp_spectra[xes_exp_name].columns:
+                print(f'No 2nd derivative found for {xes_exp_name}. Run smoothen method first, if you want to export the 2nd derivative.')
+                continue
+            xes_2nd[f'{xes_exp_name}_energy'] = self.xes_exp_spectra[xes_exp_name][f'{xes_exp_name}_energy']
+            xes_2nd[f'{xes_exp_name}_2nd'] = self.xes_exp_spectra[xes_exp_name][f'{xes_exp_name}_smoothed_2nd']
+        xes_2nd.to_csv(f'{path}/{name}_XES_2nd.csv', index=False)
+
+        xas_2nd = pd.DataFrame()
+        for xas_exp_name in self.xas_exp_spectra.keys():
+            if f'{xas_exp_name}_smoothed_2nd' not in self.xas_exp_spectra[xas_exp_name].columns:
+                print(f'No 2nd derivative found for {xas_exp_name}. Run smoothen method first, if you want to export the 2nd derivative.')
+                continue
+            xas_2nd[f'{xas_exp_name}_energy'] = self.xas_exp_spectra[xas_exp_name][f'{xas_exp_name}_energy']
+            xas_2nd[f'{xas_exp_name}_2nd'] = self.xas_exp_spectra[xas_exp_name][f'{xas_exp_name}_smoothed_2nd']
+        xas_2nd.to_csv(f'{path}/{name}_XAS_2nd.csv', index=False)
+
     
