@@ -163,3 +163,4 @@ cython_debug/
 junit/
 tests/BandgapAnalyzer/data/.DS_Store
 tio-o-k-measurements.ipynb
+.DS_Store
