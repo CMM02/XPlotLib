@@ -28,6 +28,12 @@ class BandgapAnalyzer():
     def __normalize(self, list):
         abs_max = max(max(list), -min(list))
         return [x/abs_max for x in list]
+    
+    
+    def __find_onset(self, path, binding, fermi):
+        df = pd.read_csv(path, sep='\\s+', header=None, names=['energy', 'intensity1', 'intensity2', 'intensity3'])
+        onset = min(df.loc[df['intensity1']>0]['energy']) + (binding + fermi) * ryd_to_ev
+        return onset
 
     """
     Load experimental spectra
@@ -40,9 +46,9 @@ class BandgapAnalyzer():
         Type of the spectra. Must be either 'xes' or 'xas'
     names : list of str
         Names of the spectra
-    skiprows : int
+    skiprows : int, optional
         Number of rows to skip in the beginning of the file
-    sep : str
+    sep : str, optional
         Separator used in the file
     """
     def load_exp_spectra(self, path, type, names, skiprows=2, sep=','):        
@@ -119,6 +125,14 @@ class BandgapAnalyzer():
         exp_spectra[name][f'{name}_smoothed_intensity'] = y_smoothed
         # take second derivative
         exp_spectra[name][f'{name}_smoothed_2nd'] = np.gradient(np.gradient(y_smoothed, x), x)
+
+
+        # make sure onset region includes at least one data point
+        if onset_region:
+            if onset_region[0] > onset_region[1]:
+                raise ValueError('The start of the onset region must be smaller than the end.')
+            if onset_region[1] < min(x) or onset_region[0] > max(x):
+                raise ValueError('The onset region is outside of the energy range.')
 
         if show:
             # plot the smoothed data
@@ -276,12 +290,34 @@ class BandgapAnalyzer():
                 xy, xytext, text, text_rot = self.xas_arrow
                 axes[1,1].annotate(text, xy=xy, xytext=xytext, arrowprops=dict(facecolor='black', shrink=0.05), ha='center', va='center', rotation=text_rot)
 
-    
-    def __find_onset(self, path, binding, fermi):
-        df = pd.read_csv(path, sep='\\s+', header=None, names=['energy', 'intensity1', 'intensity2', 'intensity3'])
-        onset = min(df.loc[df['intensity1']>0]['energy']) + (binding + fermi) * ryd_to_ev
-        return onset
-    
+    """
+    Export 2nd derivative of XES and XAS spectra to csv files
+
+    Parameters
+    ----------
+    path : str
+        Path to the directory where the files will be saved
+    name : str
+        Name of the files (without extension)
+    """
+    def export_2nd_derivative(self, path, name):
+        xes_2nd = pd.DataFrame()
+        for xes_exp_name in self.xes_exp_spectra.keys():
+            if f'{xes_exp_name}_smoothed_2nd' not in self.xes_exp_spectra[xes_exp_name].columns:
+                print(f'No 2nd derivative found for {xes_exp_name}. Run smoothen method first, if you want to export the 2nd derivative.')
+                continue
+            xes_2nd[f'{xes_exp_name}_energy'] = self.xes_exp_spectra[xes_exp_name][f'{xes_exp_name}_energy']
+            xes_2nd[f'{xes_exp_name}_2nd'] = self.xes_exp_spectra[xes_exp_name][f'{xes_exp_name}_smoothed_2nd']
+        xes_2nd.to_csv(f'{path}/{name}_XES_2nd.csv', index=False)
+
+        xas_2nd = pd.DataFrame()
+        for xas_exp_name in self.xas_exp_spectra.keys():
+            if f'{xas_exp_name}_smoothed_2nd' not in self.xas_exp_spectra[xas_exp_name].columns:
+                print(f'No 2nd derivative found for {xas_exp_name}. Run smoothen method first, if you want to export the 2nd derivative.')
+                continue
+            xas_2nd[f'{xas_exp_name}_energy'] = self.xas_exp_spectra[xas_exp_name][f'{xas_exp_name}_energy']
+            xas_2nd[f'{xas_exp_name}_2nd'] = self.xas_exp_spectra[xas_exp_name][f'{xas_exp_name}_smoothed_2nd']
+        xas_2nd.to_csv(f'{path}/{name}_XAS_2nd.csv', index=False)
 
     """
     Load unbrodened spectra to determine core hole shift
@@ -306,7 +342,8 @@ class BandgapAnalyzer():
         self.es_onsets.append(self.__find_onset(f'{dir}/{ES_file}', GS_binding, ES_fermi))
 
     """
-    Calculate the core hole shift using all previously loaded unbrodened spectra
+    Calculate the core hole shift using all previously loaded unbrodened spectra.
+    !Warning this might not be accurate!
 
     Returns
     -------
@@ -315,36 +352,5 @@ class BandgapAnalyzer():
     """
     def calc_core_hole_shift(self):
         return min(self.es_onsets) - min(self.gs_onsets)
-
-
-    """
-    Export 2nd derivative of XES and XAS spectra to csv files
-
-    Parameters
-    ----------
-    path : str
-        Path to the directory where the files will be saved
-    name : str
-        Name of the files (without extension)
-    """
-
-    def export_2nd_derivative(self, path, name):
-        xes_2nd = pd.DataFrame()
-        for xes_exp_name in self.xes_exp_spectra.keys():
-            if f'{xes_exp_name}_smoothed_2nd' not in self.xes_exp_spectra[xes_exp_name].columns:
-                print(f'No 2nd derivative found for {xes_exp_name}. Run smoothen method first, if you want to export the 2nd derivative.')
-                continue
-            xes_2nd[f'{xes_exp_name}_energy'] = self.xes_exp_spectra[xes_exp_name][f'{xes_exp_name}_energy']
-            xes_2nd[f'{xes_exp_name}_2nd'] = self.xes_exp_spectra[xes_exp_name][f'{xes_exp_name}_smoothed_2nd']
-        xes_2nd.to_csv(f'{path}/{name}_XES_2nd.csv', index=False)
-
-        xas_2nd = pd.DataFrame()
-        for xas_exp_name in self.xas_exp_spectra.keys():
-            if f'{xas_exp_name}_smoothed_2nd' not in self.xas_exp_spectra[xas_exp_name].columns:
-                print(f'No 2nd derivative found for {xas_exp_name}. Run smoothen method first, if you want to export the 2nd derivative.')
-                continue
-            xas_2nd[f'{xas_exp_name}_energy'] = self.xas_exp_spectra[xas_exp_name][f'{xas_exp_name}_energy']
-            xas_2nd[f'{xas_exp_name}_2nd'] = self.xas_exp_spectra[xas_exp_name][f'{xas_exp_name}_smoothed_2nd']
-        xas_2nd.to_csv(f'{path}/{name}_XAS_2nd.csv', index=False)
 
     

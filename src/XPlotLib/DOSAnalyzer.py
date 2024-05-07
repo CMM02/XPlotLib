@@ -244,11 +244,11 @@ class DOSAnalyzer:
         Name of the spectrum
     spec_type : str
         Type of the spectrum ("XES" or "XAS")
-    skiprows : int
+    skiprows : int, optional
         Number of rows to skip in the file
-    delim : str
+    delim : str, optional
         Delimiter of the file
-    shift : float
+    shift : float, optional
         Energy shift of the spectrum
     """
     def load_spectrum(self, path, name, spec_type, skiprows=1, delim=',', shift=0):
@@ -331,9 +331,9 @@ class DOSAnalyzer:
 
     Parameters
     ----------
-    xes_names : list of str
+    xes_names : list of str, optional
         List of XES DOS names to plot
-    xas_names : list of str
+    xas_names : list of str, optional
         List of XAS DOS names to plot
     """
     def set_active_dos(self, xes_names=[], xas_names=[]):
@@ -372,9 +372,9 @@ class DOSAnalyzer:
 
     Parameters
     ----------
-    xes_x_limits : tuple of float
+    xes_x_limits : tuple of float, optional
         X limits for XES DOS
-    xas_x_limits : tuple of float
+    xas_x_limits : tuple of float, optional
         X limits for XAS DOS
     """
     def set_x_limits(self, xes_x_limits=None, xas_x_limits=None):
@@ -389,8 +389,8 @@ class DOSAnalyzer:
     ----------
     staggered : bool
         Staggered DOS
-    show_spectra : list of str
-        List of spectra to show ("XES" or "XAS")
+    show_spectra : list of str, optional
+        List of spectra to show ("XES" or "XAS"), default shows both
     """
     def plot_dos(self, staggered=False, show_spectra=['XES', 'XAS']):
         if len(show_spectra) == 0:
@@ -463,8 +463,8 @@ class DOSAnalyzer:
         Path to the directory where to save the DOS
     name : str
         Name of the DOS file
-    export_spectra : list of str
-        List of spectra to export ("XES" or "XAS")
+    export_spectra : list of str, optional
+        List of spectra to export ("XES" or "XAS"), default exports both
     """
     def export_dos(self, path, name, export_spectra=['XES', 'XAS']):
         if len(export_spectra) == 0:
