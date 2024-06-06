@@ -33,10 +33,10 @@ def load_dos(dosAnalyzer):
     dosAnalyzer.load_spectrum(f'{dir}Ti3O5_O_XAS.csv', name=f'Ti3O5 exp XAS', spec_type='XAS', skiprows=2)
 
 def test_load_dos(capfd):
-    dosAnlyzer = DOSAnalyzer()
-    load_dos(dosAnlyzer)
+    dosAnalyzer = DOSAnalyzer()
+    load_dos(dosAnalyzer)
     expected = """DOS to choose from:\nO1_GS_s\nO1_GS_p\nO1_GS_PX\nO1_GS_PY\nO1_GS_PZ\nO2_GS_s\nO2_GS_p\nO2_GS_PX\nO2_GS_PY\nO2_GS_PZ\nO3_GS_s\nO3_GS_p\nO3_GS_PX\nO3_GS_PY\nO3_GS_PZ\nO4_GS_s\nO4_GS_p\nO4_GS_PX\nO4_GS_PY\nO4_GS_PZ\nO5_GS_s\nO5_GS_p\nO5_GS_PX\nO5_GS_PY\nO5_GS_PZ\nO1_ES_s\nO1_ES_p\nO1_ES_PX\nO1_ES_PY\nO1_ES_PZ\nO2_ES_s\nO2_ES_p\nO2_ES_PX\nO2_ES_PY\nO2_ES_PZ\nO3_ES_s\nO3_ES_p\nO3_ES_PX\nO3_ES_PY\nO3_ES_PZ\nO4_ES_s\nO4_ES_p\nO4_ES_PX\nO4_ES_PY\nO4_ES_PZ\nO5_ES_s\nO5_ES_p\nO5_ES_PX\nO5_ES_PY\nO5_ES_PZ\n"""
-    dosAnlyzer.print_dos_options()
+    dosAnalyzer.print_dos_options()
     out, err = capfd.readouterr()    
     assert out == expected
 

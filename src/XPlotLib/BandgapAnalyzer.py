@@ -9,12 +9,14 @@ class BandgapAnalyzer():
         self.xes_calc_spectra = {}
         self.xas_exp_spectra = {}
         self.xas_calc_spectra = {}
-        self.figsize = (14, 8)
+        self.figsize = (12, 6)
         self.xes_xlims = None
         self.xas_xlims = None
         self.subplot_labels = [['XES' , 'XAS'], ['2nd der.', '2nd der.']]
         self.xes_arrow = None
         self.xas_arrow = None
+        self.xes_line = None
+        self.xas_line = None
         self.title = None
 
         self.gs_onsets = []
@@ -215,6 +217,36 @@ class BandgapAnalyzer():
 
 
     """
+    Add a vertical line to the plot with energy label
+
+    Parameters
+    ----------
+    type : str
+        Type of the spectra. Must be either 'xes' or 'xas'
+    energy : float
+        Energy of the line
+    linestyle : str, optional
+        Linestyle of the line
+    color : str, optional
+        Color of the line
+    linewidth : float, optional
+        Width of the line
+    label : bool, optional
+        If True, the energy will be shown as a label
+    xytext : tuple of float, optional
+        Tuple containing the x and y coordinates of the label
+    """
+
+    def add_line(self, type, energy, linestyle='--', color='black', linewidth=1, label=True, xytext=None):
+        if type == 'xes':
+            self.xes_line = (energy, linestyle, color, linewidth, label, xytext)
+        elif type == 'xas':
+            self.xas_line = (energy, linestyle, color, linewidth, label, xytext)
+        else:
+            raise ValueError('type must be either "xes" or "xas"')
+
+
+    """
     Plot the spectra in four plots with the XES and XAS in the top row and their 2nd derivatives in the bottom row.
 
     Parameters
@@ -271,7 +303,7 @@ class BandgapAnalyzer():
                 
 
                 # show text in corner
-                ax.text(0.11/self.figsize[0], 1 - (1+i)*0.08/self.figsize[1], self.subplot_labels[i][j], size=12, ha='left', va='top', color='white', bbox=dict(facecolor='black', edgecolor='none', pad=3), transform=ax.transAxes)
+                ax.text(0.11/self.figsize[0], 1 - (1+i)*0.08/self.figsize[1], self.subplot_labels[i][j], size=11, ha='left', va='top', color='white', bbox=dict(facecolor='black', edgecolor='none', pad=3), transform=ax.transAxes)
                 
                 if i == 0: # spectra subplots
                     ax.legend(loc='upper right')                    
@@ -285,10 +317,30 @@ class BandgapAnalyzer():
                 xy, xytext, text, text_rot = self.xes_arrow
                 axes[1,0].annotate(text, xy=xy, xytext=xytext, arrowprops=dict(facecolor='black', shrink=0.05), ha='center', va='center', rotation=text_rot)
 
+            if self.xes_line:
+                energy, linestyle, color, linewidth, label, xytext = self.xes_line
+                axes[0,0].axvline(x=energy, color=color, linestyle=linestyle, linewidth=linewidth)
+                axes[1,0].axvline(x=energy, color=color, linestyle=linestyle, linewidth=linewidth)
+                # add energy label
+                if label:
+                    xytext = xytext if xytext else (energy + 0.2, -0.7)
+                    xy = (energy, xytext[1]) if xytext else (energy, -0.7)
+                    axes[1,0].annotate(f'{energy} eV', xy=xy, xytext=xytext, ha='left')
+
             # annotate first XAS peak
             if self.xas_arrow:
                 xy, xytext, text, text_rot = self.xas_arrow
                 axes[1,1].annotate(text, xy=xy, xytext=xytext, arrowprops=dict(facecolor='black', shrink=0.05), ha='center', va='center', rotation=text_rot)
+
+            if self.xas_line:
+                energy, linestyle, color, linewidth, label, xytext = self.xas_line
+                axes[0,1].axvline(x=energy, color=color, linestyle=linestyle, linewidth=linewidth)
+                axes[1,1].axvline(x=energy, color=color, linestyle=linestyle, linewidth=linewidth)
+                # add energy label
+                if label:
+                    xytext = xytext if xytext else (energy - 0.2, -0.7)
+                    xy = (energy, xytext[1]) if xytext else (energy, -0.7)
+                    axes[1,1].annotate(f'{energy} eV', xy=xy, xytext=xytext, ha='right')
 
     """
     Export 2nd derivative of XES and XAS spectra to csv files

@@ -27,9 +27,9 @@ class DOSAnalyzer:
         self.xas_x_lims = None
         self.staggered_spacing = 0.2
         self.title = 'DOS Analyzer'
+        self.figsize = (12, 4)
 
     def __init_plt__(self, show_spectra):
-        self.figsize = (15, 6)
 
         # create figure and axis depending on number of spectra to show
         self.fig, axis = plt.subplots(1, len(show_spectra), figsize=self.figsize, sharey=True)
@@ -116,7 +116,7 @@ class DOSAnalyzer:
         return selected_dos_dfs
     
     def __configure_plot__(self, ax, spectra, x_min, label, fig_count, x_lims=None):
-            ax.text(0.075*fig_count/self.figsize[0], 0.2/self.figsize[1], label, ha='left', va='top', color='white', size=12, bbox=dict(facecolor='black', edgecolor='none', pad=3.0), transform=ax.transAxes)   
+            ax.text(0.055*fig_count/self.figsize[0], 0.0155 + 0.1/self.figsize[1], label, ha='left', va='top', color='white', size=12, bbox=dict(facecolor='black', edgecolor='none', pad=3.0), transform=ax.transAxes)   
             if x_lims is None:
                 x_lims = self.__get_x_lims__(spectra.values())
             ax.set_xlim(x_lims)

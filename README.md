@@ -109,16 +109,16 @@ Configure plot and show
 bandgapAnalyzer.set_title('Ti3O5')
 # set xlims for xes and xas
 bandgapAnalyzer.set_xlims([515, 535], [520, 540])
-# add arrows indicating the onset position with spectra type, arrow head pos, text pos and text
-bandgapAnalyzer.add_arrow('xes', (528.8, 0.15), (531.8, 0.35), '528.8 eV')
-bandgapAnalyzer.add_arrow('xas', (529, 1.7), (526, 1.7), '529.1 eV')
+# add lines indicating the onset position with spectra type and energy
+bandgapAnalyzer.add_line('xes', 528.8)
+bandgapAnalyzer.add_line('xas', 529.1)
 # plot data with name of experimental and calculated XES graphs, and of experimental and calculated XAS graphs
 bandgapAnalyzer.plot(['XES'], ['XES calc'], ['PFY'], ['XANES calc'])
 ```
 
 Caclulate core hole shift through mathematical onset (!Warning: Might not be accurate!)
 ```py
-# load undbroadend spectra for all sites using path, GS file, ES file, ES binding energy, GS and ES Fermi energy
+# load undbroadend spectra for all sites using path, GS file, ES file, GS binding energy, GS and ES Fermi energy
 bandgapAnalyzer.load_unbroadened(dir, 'Ti3O5_O1_GS_XAS.txspec', 'Ti3O5_O1_ES_XAS.txspec', 10, 3, 4)
 bandgapAnalyzer.load_unbroadened(dir, 'Ti3O5_O2_GS_XAS.txspec', 'Ti3O5_O2_ES_XAS.txspec', 10, 3, 4)
 bandgapAnalyzer.calc_core_hole_shift()
@@ -148,7 +148,7 @@ file_name : str
 name : dict (string -> string)
     Name of the atoms and states (f.e. {'1': 'O1_ES', '2': 'O2_ES', ...})
 binding_energies : dict (string -> float)
-    Binding energies of each site in rydberg (f.e. {'O1_ES': 10.0, 'O2_ES': 11.0, ...})
+    Binding energies of each site in Ry (f.e. {'O1_ES': 10.0, 'O2_ES': 11.0, ...})
 """
 load_dos(dir, file_name, names, binding_energies)
 ```
@@ -167,9 +167,9 @@ file_name : str
 name : str
     Name of the atom and state (e.g. 'O1_ES')
 E_Fermi : float
-    Fermi energy in eV
+    Fermi energy in Ry
 binding_Energy : float
-    Binding energy in eV
+    Binding energy in Ry
 """
 load_single_dos(dir, file_name, name, binding_Energy)
 ```
@@ -192,7 +192,7 @@ skiprows : int, optional
 delim : str, optional
     Delimiter of the file
 shift : float, optional
-    Energy shift of the spectrum
+    Energy shift of the spectrum in eV
 """
 load_spectrum(path, name, spec_type, skiprows=1, delim=',', shift=0)
 ```
@@ -206,9 +206,9 @@ Set energy shift for XES and XAS DOS (use same values used for broadening of the
 Parameters
 ----------
 xes_shift : float
-    Energy shift for XES DOS
+    Energy shift for XES DOS in eV
 xas_shift : float
-    Energy shift for XAS DOS
+    Energy shift for XAS DOS in eV
 """
 set_shift(xes_shift, xas_shift)
 ```
@@ -471,6 +471,32 @@ text_rot : float, optional
 add_arrow(type, xy, xytext, text, text_rot = 0)
 ```
 
+#### add_line
+```py
+"""
+Add a vertical line to the plot with energy label
+
+Parameters
+----------
+type : str
+    Type of the spectra. Must be either 'xes' or 'xas'
+energy : float
+    Energy of the line
+linestyle : str, optional
+    Linestyle of the line
+color : str, optional
+    Color of the line
+linewidth : float, optional
+    Width of the line
+label : bool, optional
+    If True, the energy will be shown as a label
+xytext : tuple of float, optional
+    Tuple containing the x and y coordinates of the label
+"""
+
+add_line(type, energy, linestyle='--', color='black', linewidth=1, label=True, xytext=None)
+```
+
 #### plot
 ```py
 """
@@ -519,11 +545,11 @@ GS_file : str
 ES_file : str
     File containing the excited state XAS spectrum
 GS_binding : float
-    Binding energy of the ground state
+    Binding energy of the ground state in Ry
 GS_fermi : float
-    Fermi energy of the ground state
+    Fermi energy of the ground state in Ry
 ES_fermi : float
-    Fermi energy of the excited state
+    Fermi energy of the excited state in Ry
 """
 load_unbroadend(dir, GS_file, ES_file, GS_binding, GS_fermi, ES_fermi)
 ```
@@ -531,13 +557,13 @@ load_unbroadend(dir, GS_file, ES_file, GS_binding, GS_fermi, ES_fermi)
 #### calc_core_hole_shift
 ```py
  """
-Calculate the core hole shift using all previously loaded unbrodened spectra.
+Calculate the core hole shift using all previously loaded unbroadened spectra.
 !Warning this might not be accurate!
 
 Returns
 -------
 float
-    Core hole shift
+    Core hole shift in eV
 """
 calc_core_hole_shift()
 ```
